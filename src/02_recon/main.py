@@ -80,7 +80,7 @@ def main(args):
 
     
   if args.akp == False and args.shf is not None:
-    shifts = np.load('/mnt/' + args.shf)
+    shifts = np.load(args.shf)
     print("> Loading shifts (in mm): "
           "(x: %0.3f, y: %0.3f, z: %0.3f)" % tuple(shifts),
           flush=True)
