@@ -36,5 +36,5 @@ docker run --gpus all -v /:/mnt/:z MRF/recon
         --mtx 256 --ptt 10 --dev 0
         --pdg 0 --blk 8 --lam 5e-5 --mit 40 
 ```
-# Example data
+## Example data
 TODO!
