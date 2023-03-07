@@ -2,14 +2,14 @@ FROM continuumio/miniconda3
 
 WORKDIR /recon
 
-RUN conda install -c conda-forge cupy
-RUN conda install -c conda-forge cudnn
-RUN conda install -c conda-forge nccl
-RUN conda install -c conda-forge numba
-RUN conda install -c conda-forge pywavelets
-RUN conda install -c conda-forge tqdm
-RUN conda install -c conda-forge scipy
-RUN conda install -c anaconda pillow
+RUN conda install -c conda-forge cupy=8.3.0
+RUN conda install -c conda-forge cudnn=7.6.5.32
+RUN conda install -c conda-forge nccl=2.8.3.1
+RUN conda install -c conda-forge numba=0.55.1
+RUN conda install -c conda-forge pywavelets=1.3.0 
+RUN conda install -c conda-forge tqdm=4.64.1
+RUN conda install -c conda-forge scipy=1.8.1
+RUN conda install -c anaconda pillow=9.0.1
 RUN pip install git+https://github.com/mikgroup/sigpy.git@master
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
