@@ -20,4 +20,4 @@ COPY GERecon.so /
 COPY main.py /
 
 # Entrypoint.
-ENTRYPOINT ["python3", "main.py"]
+ENTRYPOINT ["python3", "/main.py"]

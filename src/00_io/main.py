@@ -75,7 +75,8 @@ def main(args):
       f.write(f'{hdr["exam_num"]}\n')
       f.write(f'{hdr["number_of_interleaves"]}\n')
       f.write(f'{hdr["in_plane_acceleration"]}\n')
-      
+      f.write(f'{hdr["trj_rot_xita"]}\n')
+      f.write(f'{hdr["trj_rot_beta"]}\n')
 
   # Saving parameters as pickle file.
   if args.pkl is not None:
