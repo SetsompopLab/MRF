@@ -111,6 +111,29 @@ def main(args):
   if trj.shape[0] == 3:
     trj[2, ...] = trj[2, ...] * sz
 
+  if args.dcf is not None and os.path.isfile( args.dcf):
+    # Density compensation.
+    print("> Loading DCF... ", end="", flush=True)
+    start_time = time.perf_counter()
+    with dev:
+      dcf = xp.load( args.dcf).astype(xp.float32)
+    end_time = time.perf_counter()
+    print("done. Time taken: %0.2f seconds." % (end_time - start_time),
+          flush=True)
+  elif args.dcf is not None and not os.path.isfile( args.dcf):
+    print("> Estimating and saving Pipe-Menon DCF.", flush=True)
+    start_time = time.perf_counter()
+    with dev:
+      dcf = pipe_menon_dcf(trj, img_shape=[sx,sy,sz], device=dev,
+                           show_pbar=False).real.astype(xp.float32)
+      xp.save( args.dcf, dcf)
+
+  sqrt_dcf = None
+  if args.dcf is not None:
+    with dev:
+      dcf /= xp.linalg.norm(dcf.ravel(), ord=xp.inf)
+      sqrt_dcf = xp.sqrt(dcf)
+      
   # Coil calibration.
   if args.mps is not None and os.path.isfile( args.mps):
     print("> Loading maps... ", end="", flush=True)
@@ -129,7 +152,7 @@ def main(args):
     if args.mal=='espirit':
       print("Using ESPIRiT", flush=True)
       with dev:
-        im = sp.nufft_adjoint(calib_ksp,calib_trj,oshape=(nc,sz,sy,sx),oversamp=2)
+        im = sp.nufft_adjoint(calib_ksp*sp.to_device(dcf[None,...],-1),calib_trj,oshape=(nc,sz,sy,sx),oversamp=2)
         calib_ksp = sp.to_device(sp.resize(sp.fft(im,axes=(1,2,3)),(nc,sz,sy,sx)),dev)
         mps = mr.app.EspiritCalib(calib_ksp, \
                         device=dev, \
@@ -165,31 +188,6 @@ def main(args):
   end_time = time.perf_counter()
   print("done. Time taken: %0.2f seconds." % (end_time - start_time),
         flush=True)
-
-
-  if args.dcf is not None and os.path.isfile( args.dcf):
-    # Density compensation.
-    print("> Loading DCF... ", end="", flush=True)
-    start_time = time.perf_counter()
-    with dev:
-      dcf = xp.load( args.dcf).astype(xp.float32)
-    end_time = time.perf_counter()
-    print("done. Time taken: %0.2f seconds." % (end_time - start_time),
-          flush=True)
-  elif args.dcf is not None and not os.path.isfile( args.dcf):
-    print("> Estimating and saving Pipe-Menon DCF.", flush=True)
-    start_time = time.perf_counter()
-    with dev:
-      dcf = pipe_menon_dcf(trj, img_shape=mps.shape[1:], device=dev,
-                           show_pbar=False).real.astype(xp.float32)
-      xp.save( args.dcf, dcf)
-
-  sqrt_dcf = None
-  if args.dcf is not None:
-    with dev:
-      dcf /= xp.linalg.norm(dcf.ravel(), ord=xp.inf)
-      sqrt_dcf = xp.sqrt(dcf)
-      del dcf
 
 
   if args.bmp is not None:
